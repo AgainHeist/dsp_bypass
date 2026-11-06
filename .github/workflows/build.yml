@@ -1,1 +1,29 @@
 
+name: build-kpm
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: JavSaia/KernelPatch
+          ref: 0.13.9-kp-selinux-r2
+          path: KernelPatch
+
+      - uses: android-actions/setup-android@v3
+
+      - run: yes | sdkmanager "ndk;25.2.9519653"
+
+      - run: make KP_DIR=$GITHUB_WORKSPACE/KernelPatch NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsp_bypass-kpm
+          path: dsp_bypass.kpm
